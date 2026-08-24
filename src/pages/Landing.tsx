@@ -7,6 +7,7 @@ import {
   useInView,
 } from "framer-motion";
 import { CursorReactiveBackground } from "@/components/CursorReactiveBackground";
+import { MagneticButton } from "@/components/MagneticButton";
 import { useNavigate } from "react-router";
 import {
   Shield,
@@ -552,27 +553,31 @@ export default function Landing() {
             transition={{ delay: 1, duration: 0.6 }}
             className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-12"
           >
-            <motion.div whileHover={{ scale: 1.05, boxShadow: "0 0 40px oklch(0.6 0.18 250 / 30%)" }} whileTap={{ scale: 0.97 }}>
-              <Button
-                size="lg"
-                className="h-14 px-10 text-sm gap-2.5 shadow-lg shadow-primary/20 font-semibold"
-                onClick={() => navigate("/auth?returnTo=/dashboard")}
-              >
-                <Lock className="w-4 h-4" />
-                Enter Command Center
-              </Button>
-            </motion.div>
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }}>
-              <Button
-                variant="outline"
-                size="lg"
-                className="h-14 px-10 text-sm gap-2.5 glass-panel border-white/10 font-semibold"
-                onClick={() => navigate("/dashboard")}
-              >
-                <Play className="w-4 h-4" />
-                Watch Demo
-              </Button>
-            </motion.div>
+            <MagneticButton strength={0.35}>
+              <motion.div whileHover={{ scale: 1.05, boxShadow: "0 0 40px oklch(0.6 0.18 250 / 30%)" }} whileTap={{ scale: 0.97 }}>
+                <Button
+                  size="lg"
+                  className="h-14 px-10 text-sm gap-2.5 shadow-lg shadow-primary/20 font-semibold"
+                  onClick={() => navigate("/auth?returnTo=/dashboard")}
+                >
+                  <Lock className="w-4 h-4" />
+                  Enter Command Center
+                </Button>
+              </motion.div>
+            </MagneticButton>
+            <MagneticButton strength={0.35}>
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }}>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="h-14 px-10 text-sm gap-2.5 glass-panel border-white/10 font-semibold"
+                  onClick={() => navigate("/dashboard")}
+                >
+                  <Play className="w-4 h-4" />
+                  Watch Demo
+                </Button>
+              </motion.div>
+            </MagneticButton>
           </motion.div>
 
           {/* Scroll indicator */}
@@ -710,20 +715,23 @@ export default function Landing() {
                   fast.
                 </p>
 
-                <motion.div
-                  className="mt-10"
-                  whileHover={{ scale: 1.05, boxShadow: "0 0 40px oklch(0.6 0.18 250 / 30%)" }}
-                  whileTap={{ scale: 0.97 }}
-                >
-                  <Button
-                    size="lg"
-                    className="h-14 px-10 text-sm gap-2.5 shadow-lg shadow-primary/25 font-semibold"
-                    onClick={() => navigate("/auth?returnTo=/dashboard")}
-                  >
-                    <Lock className="w-4 h-4" />
-                    Access Command Center
-                  </Button>
-                </motion.div>
+                <div className="mt-10">
+                  <MagneticButton strength={0.4}>
+                    <motion.div
+                      whileHover={{ scale: 1.05, boxShadow: "0 0 40px oklch(0.6 0.18 250 / 30%)" }}
+                      whileTap={{ scale: 0.97 }}
+                    >
+                      <Button
+                        size="lg"
+                        className="h-14 px-10 text-sm gap-2.5 shadow-lg shadow-primary/25 font-semibold"
+                        onClick={() => navigate("/auth?returnTo=/dashboard")}
+                      >
+                        <Lock className="w-4 h-4" />
+                        Access Command Center
+                      </Button>
+                    </motion.div>
+                  </MagneticButton>
+                </div>
               </div>
             </div>
           </motion.div>

@@ -96,7 +96,13 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border;
+    outline: none;
+  }
+  *:focus-visible {
+    outline: 2px solid oklch(0.6 0.18 250 / 50%);
+    outline-offset: 2px;
+    border-radius: var(--radius);
   }
   body {
     @apply bg-background text-foreground;
@@ -160,5 +166,18 @@
   .neon-border {
     border: 1px solid oklch(0.5 0.15 250 / 10%);
     box-shadow: 0 0 20px oklch(0.5 0.15 250 / 6%), inset 0 0 20px oklch(0.5 0.15 250 / 3%);
+  }
+  /* Remove ALL outlines on buttons and interactive elements */
+  button, [role="button"], a, input, select, textarea {
+    outline: none !important;
+  }
+  /* Custom focus for keyboard navigation only */
+  button:focus-visible, [role="button"]:focus-visible, a:focus-visible {
+    outline: 2px solid oklch(0.6 0.18 250 / 40%);
+    outline-offset: 2px;
+  }
+  /* Smooth scroll */
+  html {
+    scroll-behavior: smooth;
   }
 }
