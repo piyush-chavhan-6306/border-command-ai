@@ -15,7 +15,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { drawScene, drawDetection, drawBoundaryOverlay } from "@/lib/camera-engine";
 import { updateDetections, getSnapshotUrl } from "@/lib/detection-simulator";
-import type { Detection, DrawingPoint, BoundaryShape } from "@/types/surveillance";
+import type { DrawingPoint, BoundaryShape } from "@/types/surveillance";
 
 interface CameraFeedProps {
   cameraId: string;
@@ -36,10 +36,10 @@ const TARGET_OPTIONS = [
 ] as const;
 
 const DETECTION_COLORS: Record<string, string> = {
-  Person: "rgba(220, 50, 50, 0.9)",
-  Vehicle: "rgba(50, 150, 220, 0.9)",
-  Car: "rgba(50, 200, 120, 0.9)",
-  Animal: "rgba(200, 150, 50, 0.9)",
+  Person: "rgba(240, 70, 70, 0.9)",
+  Vehicle: "rgba(70, 170, 240, 0.9)",
+  Car: "rgba(70, 220, 140, 0.9)",
+  Animal: "rgba(220, 170, 70, 0.9)",
 };
 
 export function CameraFeed({
@@ -58,10 +58,8 @@ export function CameraFeed({
   const [isPaused, setIsPaused] = useState(false);
   const [drawingMode, setDrawingMode] = useState<"zone" | "tripwire" | null>(null);
   const [drawingVertices, setDrawingVertices] = useState<DrawingPoint[]>([]);
-  const [detections, setDetections] = useState<Detection[]>([]);
   const [canvasSize, setCanvasSize] = useState({ w: 800, h: 450 });
   const [frameCount, setFrameCount] = useState(0);
-  const animRef = useRef<number>(0);
   const isPausedRef = useRef(isPaused);
 
   useEffect(() => {
@@ -95,7 +93,6 @@ export function CameraFeed({
       if (!isPausedRef.current) {
         drawScene(ctx, canvasSize.w, canvasSize.h, time);
         const dets = updateDetections(canvasSize.w, canvasSize.h);
-        setDetections(dets);
 
         // Draw filtered detections
         for (const d of dets) {
@@ -107,26 +104,55 @@ export function CameraFeed({
 
         // Draw existing boundaries
         for (const b of boundaries) {
-          const color = b.type === "zone" ? "rgb(50, 150, 220)" : "rgb(220, 100, 50)";
+          const color = b.type === "zone" ? "rgb(80, 180, 255)" : "rgb(255, 120, 70)";
           drawBoundaryOverlay(ctx, b.vertices, b.type, color, true);
         }
 
         // Draw in-progress vertices
         if (drawingVertices.length > 0) {
-          const color = drawingMode === "zone" ? "rgb(50, 150, 220)" : "rgb(220, 100, 50)";
+          const color = drawingMode === "zone" ? "rgb(80, 180, 255)" : "rgb(255, 120, 70)";
           drawBoundaryOverlay(ctx, drawingVertices, drawingMode || "zone", color, false);
         }
 
-        // Timestamp overlay
+        // HUD overlay
         const now = new Date();
         const ts = now.toLocaleTimeString("en-US", { hour12: true });
-        ctx.fillStyle = "rgba(0,0,0,0.5)";
-        ctx.fillRect(canvasSize.w - 180, 8, 172, 24);
-        ctx.fillStyle = "#fff";
-        ctx.font = "12px monospace";
-        ctx.fillText(`CAM: ${cameraName}  ${ts}`, canvasSize.w - 174, 24);
+        ctx.fillStyle = "rgba(0,0,0,0.65)";
+        ctx.fillRect(canvasSize.w - 200, 8, 192, 26);
+        ctx.fillStyle = "#a0c0ff";
+        ctx.font = "11px 'SF Mono', 'Consolas', monospace";
+        ctx.fillText(`${cameraName}  ${ts}`, canvasSize.w - 194, 25);
 
-        // FPS counter
+        // Corner brackets
+        ctx.strokeStyle = "rgba(80, 180, 255, 0.3)";
+        ctx.lineWidth = 1;
+        const m = 12;
+        const bLen = 30;
+        // top-left
+        ctx.beginPath();
+        ctx.moveTo(m, m + bLen);
+        ctx.lineTo(m, m);
+        ctx.lineTo(m + bLen, m);
+        ctx.stroke();
+        // top-right
+        ctx.beginPath();
+        ctx.moveTo(canvasSize.w - m - bLen, m);
+        ctx.lineTo(canvasSize.w - m, m);
+        ctx.lineTo(canvasSize.w - m, m + bLen);
+        ctx.stroke();
+        // bottom-left
+        ctx.beginPath();
+        ctx.moveTo(m, canvasSize.h - m - bLen);
+        ctx.lineTo(m, canvasSize.h - m);
+        ctx.lineTo(m + bLen, canvasSize.h - m);
+        ctx.stroke();
+        // bottom-right
+        ctx.beginPath();
+        ctx.moveTo(canvasSize.w - m - bLen, canvasSize.h - m);
+        ctx.lineTo(canvasSize.w - m, canvasSize.h - m);
+        ctx.lineTo(canvasSize.w - m, canvasSize.h - m - bLen);
+        ctx.stroke();
+
         setFrameCount((c) => c + 1);
       }
       frameId = requestAnimationFrame(animate);
@@ -189,61 +215,58 @@ export function CameraFeed({
     }
   };
 
-  const captureSnapshot = () => {
-    if (canvasRef.current && onDetectionSnapshot) {
-      onDetectionSnapshot(getSnapshotUrl(canvasRef.current));
-    }
-  };
-
-  const fps = Math.round(frameCount / (Date.now() / 1000)) || 30;
-
   return (
-    <div className="glass-card rounded-2xl overflow-hidden">
+    <div className="glass-card rounded-2xl overflow-hidden neon-border">
       {/* Camera Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-white/40">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-white/5">
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
-            <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="font-semibold text-sm text-foreground/80">{cameraName}</span>
+            <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_oklch(0.7_0.18_155/60%)]" />
+            <span className="font-semibold text-sm text-foreground">{cameraName}</span>
           </div>
-          <Badge variant="secondary" className="text-[10px] px-1.5 py-0.5 font-mono">
+          <Badge variant="secondary" className="text-[10px] px-1.5 py-0.5 font-mono border-white/5">
             {canvasSize.w}×{canvasSize.h}
           </Badge>
-          <Badge variant="secondary" className="text-[10px] px-1.5 py-0.5 font-mono bg-primary/10 text-primary">
+          <Badge variant="secondary" className="text-[10px] px-1.5 py-0.5 font-mono bg-primary/10 text-primary border-primary/15">
             LIVE
           </Badge>
         </div>
         <div className="flex items-center gap-2">
-          {/* Drawing Tools */}
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-7 text-xs gap-1.5 glass-panel border-white/30"
-            onClick={() => startDrawing("zone")}
-            disabled={!!drawingMode}
-          >
-            <Pencil className="w-3 h-3" />
-            Draw Zone
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-7 text-xs gap-1.5 glass-panel border-white/30"
-            onClick={() => startDrawing("tripwire")}
-            disabled={!!drawingMode}
-          >
-            <Zap className="w-3 h-3" />
-            Draw Tripwire
-          </Button>
+          <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-7 text-xs gap-1.5 glass-inset border-white/5"
+              onClick={() => startDrawing("zone")}
+              disabled={!!drawingMode}
+            >
+              <Pencil className="w-3 h-3" />
+              Draw Zone
+            </Button>
+          </motion.div>
+          <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-7 text-xs gap-1.5 glass-inset border-white/5"
+              onClick={() => startDrawing("tripwire")}
+              disabled={!!drawingMode}
+            >
+              <Zap className="w-3 h-3" />
+              Draw Tripwire
+            </Button>
+          </motion.div>
           {drawingMode && (
             <>
-              <Button
-                size="sm"
-                className="h-7 text-xs gap-1.5 bg-emerald-500 hover:bg-emerald-600 text-white"
-                onClick={finishDrawing}
-              >
-                Save
-              </Button>
+              <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
+                <Button
+                  size="sm"
+                  className="h-7 text-xs gap-1.5 bg-emerald-600 hover:bg-emerald-500 text-white"
+                  onClick={finishDrawing}
+                >
+                  Save
+                </Button>
+              </motion.div>
               <Button
                 variant="destructive"
                 size="sm"
@@ -264,9 +287,9 @@ export function CameraFeed({
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="bg-amber-500/10 border-b border-amber-500/20 px-4 py-1.5"
+            className="bg-amber-500/10 border-b border-amber-500/15 px-4 py-1.5"
           >
-            <p className="text-xs text-amber-700 font-medium">
+            <p className="text-xs text-amber-400 font-medium">
               {drawingMode === "zone" ? "🔷 Polygon" : "⚡ Tripwire"} mode — Click to place vertices.
               {drawingMode === "zone" && " Close the polygon by clicking near the first point."}
               {" "}Click <strong>Save</strong> when done.
@@ -276,7 +299,7 @@ export function CameraFeed({
       </AnimatePresence>
 
       {/* Canvas */}
-      <div ref={containerRef} className="relative bg-neutral-100">
+      <div ref={containerRef} className="relative bg-black/30">
         <canvas
           ref={canvasRef}
           width={canvasSize.w}
@@ -287,42 +310,44 @@ export function CameraFeed({
         />
         {!isPaused && (
           <div className="absolute top-3 left-3">
-            <div className="flex items-center gap-1.5 bg-black/50 rounded-full px-2.5 py-1">
-              <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-              <span className="text-[10px] text-white font-mono">REC</span>
+            <div className="flex items-center gap-1.5 bg-black/60 backdrop-blur-sm rounded-full px-2.5 py-1 border border-white/5">
+              <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse shadow-[0_0_6px_oklch(0.7_0.25_25/60%)]" />
+              <span className="text-[10px] text-white/90 font-mono tracking-wider">REC</span>
             </div>
           </div>
         )}
         {isPaused && !drawingMode && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/10">
-            <div className="bg-black/50 rounded-full px-4 py-2 flex items-center gap-2">
-              <Pause className="w-4 h-4 text-white" />
-              <span className="text-xs text-white font-medium">PAUSED</span>
+          <div className="absolute inset-0 flex items-center justify-center bg-black/30 backdrop-blur-[2px]">
+            <div className="glass-card rounded-full px-4 py-2 flex items-center gap-2 border border-white/10">
+              <Pause className="w-4 h-4 text-foreground/70" />
+              <span className="text-xs text-foreground/70 font-medium">PAUSED</span>
             </div>
           </div>
         )}
-        <button
-          className="absolute bottom-3 right-3 bg-black/50 hover:bg-black/70 rounded-full p-2 transition-colors"
+        <motion.button
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          className="absolute bottom-3 right-3 glass-card hover:bg-white/10 rounded-full p-2 transition-colors border border-white/5"
           onClick={() => setIsPaused(!isPaused)}
         >
-          {isPaused ? <Play className="w-4 h-4 text-white" /> : <Pause className="w-4 h-4 text-white" />}
-        </button>
+          {isPaused ? <Play className="w-4 h-4 text-foreground/70" /> : <Pause className="w-4 h-4 text-foreground/70" />}
+        </motion.button>
       </div>
 
       {/* Active Boundaries Tags */}
       {boundaries.length > 0 && (
-        <div className="px-4 py-2.5 border-t border-white/30 flex flex-wrap gap-2">
+        <div className="px-4 py-2.5 border-t border-white/5 flex flex-wrap gap-2">
           {boundaries.map((b) => (
             <motion.button
               key={b.id}
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium glass-panel hover:bg-red-50 transition-colors group"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium glass-card hover:bg-red-500/10 transition-colors group border border-white/5"
             >
               {b.type === "zone" ? "🔷" : "⚡"}
-              <span>{b.name}</span>
+              <span className="text-foreground/70">{b.name}</span>
               <X
-                className="w-3 h-3 text-muted-foreground group-hover:text-red-500 transition-colors"
+                className="w-3 h-3 text-muted-foreground/50 group-hover:text-red-400 transition-colors"
                 onClick={(e) => {
                   e.stopPropagation();
                   onBoundaryRemove(b.id);
@@ -334,8 +359,8 @@ export function CameraFeed({
       )}
 
       {/* Target Filters */}
-      <div className="px-4 py-2.5 border-t border-white/30 flex items-center gap-4">
-        <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
+      <div className="px-4 py-2.5 border-t border-white/5 flex items-center gap-4">
+        <span className="text-[11px] font-medium text-muted-foreground/60 uppercase tracking-wider">
           Alert Filters
         </span>
         {TARGET_OPTIONS.map((opt) => (
@@ -346,10 +371,10 @@ export function CameraFeed({
             <Checkbox
               checked={targetFilters.includes(opt.id)}
               onCheckedChange={() => handleToggleFilter(opt.id)}
-              className="w-3.5 h-3.5"
+              className="w-3.5 h-3.5 border-white/15"
             />
-            <opt.icon className="w-3 h-3 text-muted-foreground" />
-            <span className="text-xs text-foreground/70 group-hover:text-foreground transition-colors">
+            <opt.icon className="w-3 h-3 text-muted-foreground/60" />
+            <span className="text-xs text-foreground/60 group-hover:text-foreground/80 transition-colors">
               {opt.label}
             </span>
           </label>

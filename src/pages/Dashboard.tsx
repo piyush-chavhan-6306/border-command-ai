@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from "react";
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -8,6 +8,7 @@ import {
   Shield,
   Radio,
   LogOut,
+  ChevronLeft,
 } from "lucide-react";
 import { CameraFeed } from "@/components/CameraFeed";
 import { AlertPanel } from "@/components/AlertPanel";
@@ -61,8 +62,11 @@ function generateAlert(
 export default function Dashboard() {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const { scrollYProgress } = useScroll();
 
-  // Camera state (starts with one default camera)
+  const headerOpacity = useTransform(scrollYProgress, [0, 0.05], [0.95, 1]);
+  const headerBlur = useTransform(scrollYProgress, [0, 0.05], [16, 24]);
+
   const [cameraId] = useState("cam-default-1");
   const [cameraName] = useState("Main Gate Camera");
   const [targetFilters, setTargetFilters] = useState<string[]>(["Person", "Vehicle", "Car"]);
@@ -73,10 +77,9 @@ export default function Dashboard() {
   const [selectedAlertTime, setSelectedAlertTime] = useState<number | null>(null);
   const alertGenRef = useRef(0);
 
-  // Generate simulated alerts periodically
   useEffect(() => {
     const interval = setInterval(() => {
-      if (alertGenRef.current >= 20) return; // Cap at 20 alerts
+      if (alertGenRef.current >= 20) return;
       const types = ["Person", "Vehicle", "Car"];
       const type = types[Math.floor(Math.random() * types.length)];
       const trackId = Math.floor(Math.random() * 20) + 1;
@@ -87,7 +90,6 @@ export default function Dashboard() {
       alertGenRef.current++;
     }, 8000 + Math.random() * 12000);
 
-    // Generate first alert quickly
     const firstTimeout = setTimeout(() => {
       const alert = generateAlert("Person #4", "Person", 4, 0.94, 1.8);
       setAlerts([alert]);
@@ -144,20 +146,29 @@ export default function Dashboard() {
 
   return (
     <main className="min-h-screen pb-24">
-      {/* Header */}
+      {/* ─── HEADER ──────────────────────────────────────────────────────── */}
       <motion.header
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        className="glass-panel sticky top-0 z-20 px-6 py-3 glow-line"
+        style={{ opacity: headerOpacity }}
+        className="glass-panel sticky top-0 z-20 px-4 sm:px-6 py-3 glow-line"
       >
         <div className="max-w-[1800px] mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
+            {/* Back button */}
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+              className="w-8 h-8 rounded-lg glass-card flex items-center justify-center border border-white/5"
+              onClick={() => navigate("/")}
+            >
+              <ChevronLeft className="w-4 h-4 text-muted-foreground" />
+            </motion.button>
+
             <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center">
-                <Shield className="w-5 h-5 text-primary" />
+              <div className="w-9 h-9 rounded-xl bg-primary/10 border border-primary/15 flex items-center justify-center">
+                <Shield className="w-5 h-5 text-primary drop-shadow-[0_0_8px_oklch(0.6_0.18_250/40%)]" />
               </div>
               <div>
-                <h1 className="text-sm font-bold text-foreground/80 tracking-tight">
+                <h1 className="text-sm font-bold text-foreground tracking-tight">
                   SENTINEL
                 </h1>
                 <p className="text-[10px] text-muted-foreground -mt-0.5">
@@ -165,12 +176,13 @@ export default function Dashboard() {
                 </p>
               </div>
             </div>
+
             <div className="hidden sm:flex items-center gap-3 ml-4">
-              <Badge variant="secondary" className="text-[10px] px-2 py-0.5 gap-1 font-mono">
-                <Radio className="w-3 h-3 text-emerald-500" />
+              <Badge variant="secondary" className="text-[10px] px-2 py-0.5 gap-1 font-mono border-white/5">
+                <Radio className="w-3 h-3 text-emerald-400" />
                 1 Camera
               </Badge>
-              <Badge variant="secondary" className="text-[10px] px-2 py-0.5 font-mono">
+              <Badge variant="secondary" className="text-[10px] px-2 py-0.5 font-mono border-white/5">
                 30 FPS
               </Badge>
               {newAlertCount > 0 && (
@@ -186,20 +198,23 @@ export default function Dashboard() {
               )}
             </div>
           </div>
+
           <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-8 text-xs gap-1.5 glass-panel border-white/30"
-              onClick={() => setShowAddCamera(true)}
-            >
-              <Plus className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Add Camera</span>
-            </Button>
+            <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 text-xs gap-1.5 glass-panel border-white/5"
+                onClick={() => setShowAddCamera(true)}
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Add Camera</span>
+              </Button>
+            </motion.div>
             <Button
               variant="ghost"
               size="sm"
-              className="h-8 text-xs gap-1.5 text-muted-foreground hover:text-red-500"
+              className="h-8 text-xs gap-1.5 text-muted-foreground hover:text-red-400"
               onClick={handleClearAll}
               disabled={alerts.length === 0}
             >
@@ -218,15 +233,16 @@ export default function Dashboard() {
         </div>
       </motion.header>
 
-      {/* Main Content */}
+      {/* ─── MAIN CONTENT ────────────────────────────────────────────────── */}
       <div className="max-w-[1800px] mx-auto px-4 sm:px-6 pt-4">
         <div className="flex gap-4" style={{ minHeight: "calc(100vh - 160px)" }}>
           {/* Left: Camera Feed (70%) */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
+            initial={{ opacity: 0, y: 30, rotateX: 5 }}
+            animate={{ opacity: 1, y: 0, rotateX: 0 }}
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
             className="flex-[7] min-w-0"
+            style={{ perspective: 1200 }}
           >
             <CameraFeed
               cameraId={cameraId}
@@ -242,9 +258,9 @@ export default function Dashboard() {
 
           {/* Right: Alert Panel (30%) */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
+            initial={{ opacity: 0, x: 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.7, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
             className="flex-[3] min-w-[300px]"
             style={{ maxHeight: "calc(100vh - 160px)" }}
           >
@@ -259,10 +275,10 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* AI Assistant Bar */}
+      {/* ─── AI ASSISTANT ────────────────────────────────────────────────── */}
       <AIAssistantBar alerts={alerts} />
 
-      {/* Alert Inspector */}
+      {/* ─── ALERT INSPECTOR ─────────────────────────────────────────────── */}
       <AlertInspector
         alert={selectedAlert}
         onClose={() => setSelectedAlert(null)}
@@ -270,14 +286,11 @@ export default function Dashboard() {
         onSeekTime={handleSeekTime}
       />
 
-      {/* Add Camera Modal */}
+      {/* ─── ADD CAMERA MODAL ────────────────────────────────────────────── */}
       <AddCameraModal
         open={showAddCamera}
         onClose={() => setShowAddCamera(false)}
-        onAdd={(camera) => {
-          // In V1, just show a toast — we have one simulated camera
-          setShowAddCamera(false);
-        }}
+        onAdd={() => setShowAddCamera(false)}
       />
     </main>
   );

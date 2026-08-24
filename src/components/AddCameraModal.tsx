@@ -114,10 +114,12 @@ export function AddCameraModal({ open, onClose, onAdd }: AddCameraModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && handleClose()}>
-      <DialogContent className="glass-card sm:max-w-[500px] border-white/40">
+      <DialogContent className="glass-panel sm:max-w-[500px] border-white/5 shadow-2xl shadow-black/40">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Camera className="w-5 h-5 text-primary" />
+            <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/15 flex items-center justify-center">
+              <Camera className="w-4 h-4 text-primary" />
+            </div>
             Add Camera
           </DialogTitle>
           <DialogDescription>
@@ -128,7 +130,7 @@ export function AddCameraModal({ open, onClose, onAdd }: AddCameraModalProps) {
         <div className="space-y-4 mt-2">
           {/* Camera Name */}
           <div className="space-y-2">
-            <Label htmlFor="camera-name" className="text-xs font-medium">
+            <Label htmlFor="camera-name" className="text-xs font-medium text-foreground/70">
               Camera Name
             </Label>
             <Input
@@ -136,22 +138,22 @@ export function AddCameraModal({ open, onClose, onAdd }: AddCameraModalProps) {
               placeholder="e.g. Main Gate, Perimeter Alpha"
               value={cameraName}
               onChange={(e) => setCameraName(e.target.value)}
-              className="glass-panel border-white/30"
+              className="glass-inset border-white/5"
             />
           </div>
 
           {/* Source Tabs */}
           <Tabs value={tab} onValueChange={setTab}>
-            <TabsList className="glass-panel w-full">
-              <TabsTrigger value="upload" className="flex-1 gap-1.5 text-xs">
+            <TabsList className="glass-inset w-full border-white/5">
+              <TabsTrigger value="upload" className="flex-1 gap-1.5 text-xs data-[state=active]:bg-primary/15 data-[state=active]:text-primary">
                 <Upload className="w-3.5 h-3.5" />
                 Video File
               </TabsTrigger>
-              <TabsTrigger value="webcam" className="flex-1 gap-1.5 text-xs">
+              <TabsTrigger value="webcam" className="flex-1 gap-1.5 text-xs data-[state=active]:bg-primary/15 data-[state=active]:text-primary">
                 <Camera className="w-3.5 h-3.5" />
                 Webcam
               </TabsTrigger>
-              <TabsTrigger value="rtsp" className="flex-1 gap-1.5 text-xs">
+              <TabsTrigger value="rtsp" className="flex-1 gap-1.5 text-xs data-[state=active]:bg-primary/15 data-[state=active]:text-primary">
                 <Wifi className="w-3.5 h-3.5" />
                 RTSP Stream
               </TabsTrigger>
@@ -162,43 +164,43 @@ export function AddCameraModal({ open, onClose, onAdd }: AddCameraModalProps) {
               <div
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={handleFileDrop}
-                className="border-2 border-dashed border-white/30 rounded-xl p-8 text-center hover:border-primary/30 transition-colors"
+                className="glass-card border border-dashed border-white/10 rounded-xl p-8 text-center hover:border-primary/30 transition-colors cursor-pointer"
               >
                 {isUploading ? (
                   <div className="space-y-3">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/15 flex items-center justify-center mx-auto">
                       <FileVideo className="w-5 h-5 text-primary animate-pulse" />
                     </div>
                     <p className="text-sm text-foreground/70">Uploading...</p>
-                    <Progress value={uploadProgress} className="h-2" />
-                    <p className="text-xs text-muted-foreground">
+                    <Progress value={uploadProgress} className="h-2 bg-white/5" />
+                    <p className="text-xs text-muted-foreground/60">
                       {Math.round(uploadProgress)}%
                     </p>
                   </div>
                 ) : uploadedFile ? (
                   <div className="space-y-3">
-                    <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center mx-auto">
-                      <Check className="w-5 h-5 text-emerald-500" />
+                    <div className="w-10 h-10 rounded-full bg-emerald-500/10 border border-emerald-500/15 flex items-center justify-center mx-auto">
+                      <Check className="w-5 h-5 text-emerald-400" />
                     </div>
-                    <p className="text-sm font-medium text-foreground/70">
+                    <p className="text-sm font-medium text-foreground/80">
                       {uploadedFile}
                     </p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs text-muted-foreground/60">
                       File ready. Click "Add Camera" to continue.
                     </p>
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    <Upload className="w-10 h-10 text-muted-foreground/40 mx-auto" />
+                    <Upload className="w-10 h-10 text-muted-foreground/30 mx-auto" />
                     <div>
-                      <p className="text-sm text-foreground/70">
+                      <p className="text-sm text-foreground/60">
                         Drag & drop a video file here
                       </p>
-                      <p className="text-xs text-muted-foreground mt-1">
+                      <p className="text-xs text-muted-foreground/50 mt-1">
                         MP4, AVI, MOV supported
                       </p>
                     </div>
-                    <Label className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 text-primary text-xs font-medium cursor-pointer hover:bg-primary/20 transition-colors">
+                    <Label className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 border border-primary/15 text-primary text-xs font-medium cursor-pointer hover:bg-primary/20 transition-colors">
                       <Upload className="w-3.5 h-3.5" />
                       Browse Files
                       <input
@@ -215,20 +217,20 @@ export function AddCameraModal({ open, onClose, onAdd }: AddCameraModalProps) {
 
             {/* Webcam Tab */}
             <TabsContent value="webcam" className="mt-3">
-              <div className="glass-inset rounded-xl p-5 space-y-4">
+              <div className="glass-card rounded-xl p-5 space-y-4 border border-white/5">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/15 flex items-center justify-center">
                     <Camera className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium">Live Webcam Input</p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-sm font-medium text-foreground/80">Live Webcam Input</p>
+                    <p className="text-xs text-muted-foreground/60">
                       Select device index for direct capture
                     </p>
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-xs font-medium">Device Index</Label>
+                  <Label className="text-xs font-medium text-foreground/70">Device Index</Label>
                   <div className="flex gap-2">
                     {[0, 1, 2].map((i) => (
                       <Button
@@ -236,7 +238,7 @@ export function AddCameraModal({ open, onClose, onAdd }: AddCameraModalProps) {
                         variant={webcamIndex === String(i) ? "default" : "outline"}
                         size="sm"
                         className={`flex-1 text-xs ${
-                          webcamIndex === String(i) ? "" : "glass-panel border-white/30"
+                          webcamIndex === String(i) ? "" : "glass-inset border-white/5"
                         }`}
                         onClick={() => setWebcamIndex(String(i))}
                       >
@@ -250,25 +252,25 @@ export function AddCameraModal({ open, onClose, onAdd }: AddCameraModalProps) {
 
             {/* RTSP Tab */}
             <TabsContent value="rtsp" className="mt-3">
-              <div className="glass-inset rounded-xl p-5 space-y-4">
+              <div className="glass-card rounded-xl p-5 space-y-4 border border-white/5">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/15 flex items-center justify-center">
                     <Wifi className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium">Network Camera Stream</p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-sm font-medium text-foreground/80">Network Camera Stream</p>
+                    <p className="text-xs text-muted-foreground/60">
                       Enter the RTSP/HTTP stream URL
                     </p>
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-xs font-medium">Stream URL</Label>
+                  <Label className="text-xs font-medium text-foreground/70">Stream URL</Label>
                   <Input
                     placeholder="rtsp://192.168.1.100:554/stream"
                     value={rtspUrl}
                     onChange={(e) => setRtspUrl(e.target.value)}
-                    className="glass-panel border-white/30 font-mono text-xs"
+                    className="glass-inset border-white/5 font-mono text-xs"
                   />
                 </div>
               </div>
@@ -280,13 +282,13 @@ export function AddCameraModal({ open, onClose, onAdd }: AddCameraModalProps) {
         <div className="flex gap-2 mt-4">
           <Button
             variant="outline"
-            className="flex-1 glass-panel border-white/30"
+            className="flex-1 glass-inset border-white/5"
             onClick={handleClose}
           >
             Cancel
           </Button>
           <Button
-            className="flex-1 gap-2"
+            className="flex-1 gap-2 font-semibold"
             disabled={!canSubmit}
             onClick={handleSubmit}
           >

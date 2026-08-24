@@ -45,23 +45,24 @@ function AlertCard({
   return (
     <motion.div
       layout
-      initial={{ opacity: 0, x: 20 }}
+      initial={{ opacity: 0, x: 30 }}
       animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -20, height: 0 }}
-      className={`glass-card rounded-xl p-3 cursor-pointer transition-all group ${
-        isSelected ? "ring-2 ring-primary/40" : ""
-      } ${alert.status === "acknowledged" ? "opacity-60" : ""}`}
+      exit={{ opacity: 0, x: -30, height: 0 }}
+      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+      className={`glass-card rounded-xl p-3.5 cursor-pointer transition-all group ${
+        isSelected ? "ring-1 ring-primary/40 neon-border" : ""
+      } ${alert.status === "acknowledged" ? "opacity-50" : ""}`}
       onClick={onSelect}
     >
       <div className="flex items-start justify-between gap-2 mb-2">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
           {isCritical ? (
-            <div className="w-7 h-7 rounded-lg bg-red-500/10 flex items-center justify-center">
-              <AlertTriangle className="w-3.5 h-3.5 text-red-500" />
+            <div className="w-7 h-7 rounded-lg bg-red-500/10 border border-red-500/15 flex items-center justify-center">
+              <AlertTriangle className="w-3.5 h-3.5 text-red-400 drop-shadow-[0_0_6px_oklch(0.7_0.25_25/50%)]" />
             </div>
           ) : (
-            <div className="w-7 h-7 rounded-lg bg-amber-500/10 flex items-center justify-center">
-              <Shield className="w-3.5 h-3.5 text-amber-500" />
+            <div className="w-7 h-7 rounded-lg bg-amber-500/10 border border-amber-500/15 flex items-center justify-center">
+              <Shield className="w-3.5 h-3.5 text-amber-400 drop-shadow-[0_0_6px_oklch(0.8_0.18_75/50%)]" />
             </div>
           )}
           <div>
@@ -72,7 +73,7 @@ function AlertCard({
               >
                 {alert.severity}
               </Badge>
-              <span className="text-[11px] font-semibold text-foreground/80">
+              <span className="text-[11px] font-semibold text-foreground">
                 {alert.targetLabel}
               </span>
             </div>
@@ -80,42 +81,44 @@ function AlertCard({
         </div>
         <div className="flex items-center gap-1">
           {alert.status === "new" ? (
-            <Badge className="text-[9px] px-1.5 py-0 bg-blue-500/10 text-blue-600 border-blue-200 font-semibold">
+            <Badge className="text-[9px] px-1.5 py-0 bg-blue-500/15 text-blue-400 border-blue-500/20 font-semibold">
               NEW
             </Badge>
           ) : (
-            <Badge variant="secondary" className="text-[9px] px-1.5 py-0 font-semibold">
+            <Badge variant="secondary" className="text-[9px] px-1.5 py-0 font-semibold border-white/5">
               ACK
             </Badge>
           )}
         </div>
       </div>
 
-      <p className="text-[11px] text-muted-foreground leading-relaxed mb-2">
+      <p className="text-[11px] text-muted-foreground leading-relaxed mb-2.5">
         {alert.reason}
       </p>
 
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
+        <div className="flex items-center gap-1 text-[10px] text-muted-foreground/70">
           <Clock className="w-3 h-3" />
           <span className="font-mono">{formatTime(alert.timestamp)}</span>
         </div>
         <div className="flex items-center gap-1.5">
           {alert.status === "new" && (
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-6 text-[10px] gap-1 glass-panel"
-              onClick={(e) => {
-                e.stopPropagation();
-                onAcknowledge();
-              }}
-            >
-              <Check className="w-3 h-3" />
-              Ack
-            </Button>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-6 text-[10px] gap-1 glass-panel border-white/5"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onAcknowledge();
+                }}
+              >
+                <Check className="w-3 h-3" />
+                Ack
+              </Button>
+            </motion.div>
           )}
-          <ChevronRight className="w-3.5 h-3.5 text-muted-foreground group-hover:text-foreground transition-colors" />
+          <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/50 group-hover:text-foreground transition-colors" />
         </div>
       </div>
     </motion.div>
@@ -135,39 +138,48 @@ export function AlertPanel({
   ).length;
 
   return (
-    <div className="glass-card rounded-2xl overflow-hidden flex flex-col h-full">
+    <div className="glass-card rounded-2xl overflow-hidden flex flex-col h-full neon-border">
       {/* Header */}
-      <div className="px-4 py-3 border-b border-white/40">
+      <div className="px-4 py-3 border-b border-white/5">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
-            <h2 className="text-sm font-bold text-foreground/80">Alerts</h2>
+            <h2 className="text-sm font-bold text-foreground">Alerts</h2>
             {newCount > 0 && (
-              <Badge
-                variant="destructive"
-                className="text-[10px] px-1.5 py-0 min-w-[20px] justify-center"
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className="relative"
               >
-                {newCount}
-              </Badge>
+                <Badge
+                  variant="destructive"
+                  className="text-[10px] px-1.5 py-0 min-w-[20px] justify-center"
+                >
+                  {newCount}
+                </Badge>
+                <div className="absolute inset-0 rounded-full bg-red-500/20 animate-ping" />
+              </motion.div>
             )}
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-7 text-xs gap-1.5 text-muted-foreground hover:text-red-500"
-            onClick={onClearAll}
-            disabled={alerts.length === 0}
-          >
-            <Trash2 className="w-3 h-3" />
-            Clear All
-          </Button>
+          <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 text-xs gap-1.5 text-muted-foreground hover:text-red-400"
+              onClick={onClearAll}
+              disabled={alerts.length === 0}
+            >
+              <Trash2 className="w-3 h-3" />
+              Clear All
+            </Button>
+          </motion.div>
         </div>
-        <div className="flex gap-3 text-[10px] text-muted-foreground">
-          <span>
-            <span className="inline-block w-1.5 h-1.5 rounded-full bg-red-500 mr-1" />
+        <div className="flex gap-3 text-[10px] text-muted-foreground/70">
+          <span className="flex items-center gap-1">
+            <span className="inline-block w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_6px_oklch(0.7_0.25_25/60%)]" />
             {criticalCount} Critical
           </span>
-          <span>
-            <span className="inline-block w-1.5 h-1.5 rounded-full bg-amber-500 mr-1" />
+          <span className="flex items-center gap-1">
+            <span className="inline-block w-1.5 h-1.5 rounded-full bg-amber-500 shadow-[0_0_6px_oklch(0.8_0.18_75/60%)]" />
             {newCount - criticalCount} Warning
           </span>
         </div>
@@ -180,14 +192,14 @@ export function AlertPanel({
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="flex flex-col items-center justify-center py-12 text-center"
+              className="flex flex-col items-center justify-center py-16 text-center"
             >
-              <div className="w-12 h-12 rounded-full bg-emerald-500/10 flex items-center justify-center mb-3">
-                <Shield className="w-6 h-6 text-emerald-500" />
+              <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/15 flex items-center justify-center mb-4">
+                <Shield className="w-7 h-7 text-emerald-400 drop-shadow-[0_0_10px_oklch(0.7_0.18_155/40%)]" />
               </div>
-              <p className="text-sm font-medium text-foreground/60">All Clear</p>
-              <p className="text-xs text-muted-foreground mt-1">
-                No active alerts. Monitoring...
+              <p className="text-sm font-semibold text-foreground/70">All Clear</p>
+              <p className="text-xs text-muted-foreground/60 mt-1.5">
+                No active alerts. Monitoring perimeter...
               </p>
             </motion.div>
           ) : (

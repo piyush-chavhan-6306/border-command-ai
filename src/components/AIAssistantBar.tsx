@@ -90,21 +90,22 @@ export function AIAssistantBar({ alerts }: AIAssistantBarProps) {
         {isExpanded && (
           <motion.div
             initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 300, opacity: 1 }}
+            animate={{ height: 320, opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="mx-4 mb-2 glass-card rounded-2xl overflow-hidden border border-white/40 shadow-xl"
+            className="mx-4 mb-2 glass-card rounded-2xl overflow-hidden border border-white/5 shadow-2xl shadow-black/40 neon-border"
           >
-            <div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/30">
-              <Bot className="w-4 h-4 text-primary" />
-              <span className="text-xs font-bold text-foreground/70 uppercase tracking-wider">
+            <div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/5">
+              <Bot className="w-4 h-4 text-primary drop-shadow-[0_0_6px_oklch(0.6_0.18_250/40%)]" />
+              <span className="text-xs font-bold text-foreground uppercase tracking-wider">
                 AI Surveillance Assistant
               </span>
-              <span className="text-[10px] text-emerald-500 font-medium ml-auto">
-                ● Online
+              <span className="text-[10px] text-emerald-400 font-medium ml-auto flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                Online
               </span>
             </div>
-            <ScrollArea className="h-[210px] px-4">
+            <ScrollArea className="h-[230px] px-4">
               <div ref={scrollRef} className="py-3 space-y-3">
                 {messages.map((msg, i) => (
                   <div
@@ -114,8 +115,8 @@ export function AIAssistantBar({ alerts }: AIAssistantBarProps) {
                     <div
                       className={`max-w-[80%] rounded-xl px-3.5 py-2.5 text-sm leading-relaxed ${
                         msg.role === "user"
-                          ? "bg-primary text-primary-foreground"
-                          : "glass-inset text-foreground/80"
+                          ? "bg-primary/20 text-foreground border border-primary/15"
+                          : "glass-inset text-foreground/80 border border-white/5"
                       }`}
                     >
                       {msg.content}
@@ -124,7 +125,7 @@ export function AIAssistantBar({ alerts }: AIAssistantBarProps) {
                 ))}
                 {isThinking && (
                   <div className="flex justify-start">
-                    <div className="glass-inset rounded-xl px-3.5 py-2.5 flex items-center gap-2">
+                    <div className="glass-inset rounded-xl px-3.5 py-2.5 flex items-center gap-2 border border-white/5">
                       <Loader2 className="w-3.5 h-3.5 animate-spin text-primary" />
                       <span className="text-xs text-muted-foreground">
                         Analyzing surveillance data...
@@ -140,36 +141,40 @@ export function AIAssistantBar({ alerts }: AIAssistantBarProps) {
 
       {/* Toggle + Input Bar */}
       <div className="mx-4 mb-4">
-        <div className="glass-card rounded-2xl border border-white/40 shadow-lg flex items-center gap-2 px-4 py-2.5">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 shrink-0"
-            onClick={() => setIsExpanded(!isExpanded)}
-          >
-            {isExpanded ? (
-              <ChevronDown className="w-4 h-4" />
-            ) : (
-              <ChevronUp className="w-4 h-4" />
-            )}
-          </Button>
-          <Bot className="w-4 h-4 text-primary shrink-0" />
+        <div className="glass-card rounded-2xl border border-white/5 shadow-xl shadow-black/30 flex items-center gap-2 px-4 py-2.5 neon-border">
+          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 shrink-0"
+              onClick={() => setIsExpanded(!isExpanded)}
+            >
+              {isExpanded ? (
+                <ChevronDown className="w-4 h-4" />
+              ) : (
+                <ChevronUp className="w-4 h-4" />
+              )}
+            </Button>
+          </motion.div>
+          <Bot className="w-4 h-4 text-primary shrink-0 drop-shadow-[0_0_6px_oklch(0.6_0.18_250/40%)]" />
           <Input
             placeholder="Ask about surveillance data..."
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSend()}
-            className="border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-sm h-8"
+            className="border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-sm h-8 text-foreground placeholder:text-muted-foreground/50"
             disabled={isThinking}
           />
-          <Button
-            size="icon"
-            className="h-8 w-8 shrink-0"
-            onClick={handleSend}
-            disabled={!input.trim() || isThinking}
-          >
-            <Send className="w-3.5 h-3.5" />
-          </Button>
+          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+            <Button
+              size="icon"
+              className="h-8 w-8 shrink-0"
+              onClick={handleSend}
+              disabled={!input.trim() || isThinking}
+            >
+              <Send className="w-3.5 h-3.5" />
+            </Button>
+          </motion.div>
         </div>
       </div>
     </div>
