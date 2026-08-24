@@ -1,12 +1,12 @@
-import { useRef, useEffect } from "react";
+import { useRef } from "react";
 import {
   motion,
   useScroll,
   useTransform,
   useSpring,
   useInView,
-  useMotionValueEvent,
 } from "framer-motion";
+import { CursorReactiveBackground } from "@/components/CursorReactiveBackground";
 import { useNavigate } from "react-router";
 import {
   Shield,
@@ -28,71 +28,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
-// ─── Animated Starfield ──────────────────────────────────────────────────────
-function Starfield() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    let animId: number;
-    const stars: { x: number; y: number; size: number; speed: number; brightness: number }[] = [];
-
-    const resize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    };
-    resize();
-    window.addEventListener("resize", resize);
-
-    // Create stars
-    for (let i = 0; i < 120; i++) {
-      stars.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        size: Math.random() * 1.5 + 0.3,
-        speed: Math.random() * 0.3 + 0.05,
-        brightness: Math.random(),
-      });
-    }
-
-    const draw = (t: number) => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const scrollY = window.scrollY;
-
-      for (const star of stars) {
-        const twinkle = Math.sin(t * 0.001 * star.speed + star.brightness * 10) * 0.3 + 0.7;
-        const alpha = star.brightness * twinkle * 0.6;
-        ctx.fillStyle = `oklch(0.85 0.02 250 / ${alpha})`;
-        ctx.beginPath();
-        ctx.arc(star.x, (star.y + scrollY * star.speed * 0.05) % canvas.height, star.size, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      // Subtle nebula clouds
-      const grd1 = ctx.createRadialGradient(
-        canvas.width * 0.3, canvas.height * 0.4, 0,
-        canvas.width * 0.3, canvas.height * 0.4, 300
-      );
-      grd1.addColorStop(0, "oklch(0.4 0.12 250 / 4%)");
-      grd1.addColorStop(1, "transparent");
-      ctx.fillStyle = grd1;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      animId = requestAnimationFrame(draw);
-    };
-    animId = requestAnimationFrame(draw);
-    return () => {
-      cancelAnimationFrame(animId);
-      window.removeEventListener("resize", resize);
-    };
-  }, []);
-
-  return <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-0" />;
-}
 
 // ─── Floating Orbs ───────────────────────────────────────────────────────────
 function FloatingOrbs() {
@@ -160,7 +96,7 @@ function HeroShield() {
         />
 
         {/* Main shield */}
-        <div className="relative w-36 h-36 sm:w-44 sm:h-44 mx-auto glass-card rounded-2xl flex items-center justify-center neon-border">
+        <div className="relative w-36 h-36 sm:w-44 sm:h-44 mx-auto rounded-2xl flex items-center justify-center" style={{ background: "oklch(0.14 0.02 260 / 50%)", border: "1px solid oklch(0.25 0.03 260 / 12%)", backdropFilter: "blur(20px)", boxShadow: "0 0 40px oklch(0.5 0.15 250 / 5%)", inset: "0 1px 0 oklch(0.3 0.03 260 / 10%)" as never }}>
           <motion.div
             animate={{ rotateY: [0, 5, -5, 0] }}
             transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
@@ -223,8 +159,8 @@ function FloatingCard({
         scale: 1.03,
         transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] },
       }}
-      style={{ perspective: 800, transformStyle: "preserve-3d" }}
-      className="glass-card rounded-2xl p-6 sm:p-7 cursor-default group relative overflow-hidden"
+      style={{ perspective: 800, transformStyle: "preserve-3d" as const, background: "oklch(0.14 0.02 260 / 40%)", border: "1px solid oklch(0.25 0.03 260 / 15%)", backdropFilter: "blur(16px)" }}
+      className="rounded-2xl p-6 sm:p-7 cursor-default group relative overflow-hidden"
     >
       {/* Hover glow effect */}
       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
@@ -497,7 +433,7 @@ export default function Landing() {
 
   return (
     <div ref={containerRef} className="min-h-screen overflow-x-hidden bg-background">
-      <Starfield />
+      <CursorReactiveBackground />
       <FloatingOrbs />
 
       {/* ─── NAV ──────────────────────────────────────────────────────────── */}
@@ -744,7 +680,7 @@ export default function Landing() {
             transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
             style={{ perspective: 1000 }}
           >
-            <div className="glass-card rounded-3xl p-10 sm:p-16 text-center relative overflow-hidden neon-border">
+            <div className="rounded-3xl p-10 sm:p-16 text-center relative overflow-hidden" style={{ background: "oklch(0.12 0.02 260 / 40%)", border: "1px solid oklch(0.25 0.03 260 / 12%)", backdropFilter: "blur(20px)" }}>
               {/* Background glow */}
               <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-blue-500/5 rounded-3xl" />
               <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
